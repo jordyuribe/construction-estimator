@@ -33,7 +33,7 @@ export const T = {
     addressPlaceholder: "e.g. 123 Main St, Bellevue WA",
   },
   es: {
-    appTitle: "Construcción de Papá",
+    appTitle: "Trabajo de mi Pa",
     appSubtitle: "Estimador de Proyectos · Gran Área de Seattle",
     estimator: "Estimador",
     summary: "Resumen",

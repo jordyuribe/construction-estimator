@@ -30,7 +30,7 @@ export default function EstimatorSection({ section, selections, onChange, lang, 
       >
         <div>
           <div style={{ fontSize: 15, fontWeight: 600, color: '#111' }}>
-            {section.name}
+            {section.name[lang]}
           </div>
           {selectedCount > 0 && (
             <div style={{ fontSize: 12, color: '#2D5A27', marginTop: 2 }}>
