@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ItemRow from './ItemRow'
 
-export default function EstimatorSection({ section, selections, onChange }) {
+export default function EstimatorSection({ section, selections, onChange, lang, T }) {
   const [open, setOpen] = useState(false)
 
   const selectedCount = section.items.filter(item => selections[item.id]?.on).length
@@ -14,8 +14,6 @@ export default function EstimatorSection({ section, selections, onChange }) {
       marginBottom: 10,
       overflow: 'hidden'
     }}>
-
-      {/* Section header — click to open/close */}
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -36,7 +34,7 @@ export default function EstimatorSection({ section, selections, onChange }) {
           </div>
           {selectedCount > 0 && (
             <div style={{ fontSize: 12, color: '#2D5A27', marginTop: 2 }}>
-              {selectedCount} item{selectedCount > 1 ? 's' : ''} selected
+              {selectedCount} {selectedCount > 1 ? T[lang].itemsSelected : T[lang].itemSelected}
             </div>
           )}
         </div>
@@ -45,7 +43,6 @@ export default function EstimatorSection({ section, selections, onChange }) {
         </span>
       </button>
 
-      {/* Items — only show when open */}
       {open && (
         <div style={{ borderTop: '1px solid #f0f0f0' }}>
           {section.items.map(item => (
@@ -58,7 +55,6 @@ export default function EstimatorSection({ section, selections, onChange }) {
           ))}
         </div>
       )}
-
     </div>
   )
 }

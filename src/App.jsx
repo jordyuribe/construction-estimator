@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SECTIONS } from './data/sections'
+import { T } from './data/translations'
 import EstimatorSection from './components/EstimatorSection'
 import SummaryView from './components/SummaryView'
 import HistoryView from './components/HistoryView'
@@ -22,6 +23,7 @@ function initSelections() {
 
 export default function App() {
   const [view, setView] = useState('estimator')
+  const [lang, setLang] = useState('en')
   const [selections, setSelections] = useState(initSelections)
   const [clientInfo, setClientInfo] = useState({
     name: '',
@@ -43,32 +45,31 @@ export default function App() {
     }))
   }
 
-function handleSave() {
-  if (lines.length <= 1) return
+  function handleSave() {
+    if (lines.length <= 1) return
 
-  const entry = {
-    id: Date.now(),
-    date: new Date().toLocaleDateString(),
-    clientName: clientInfo.name || 'Unnamed client',
-    address: clientInfo.address || 'No address',
-    notes: clientInfo.notes,
-    totalLo,
-    totalHi,
-    lines,
-    selections
+    const entry = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      clientName: clientInfo.name || T[lang].unnamedClient,
+      address: clientInfo.address || T[lang].noAddress,
+      notes: clientInfo.notes,
+      totalLo,
+      totalHi,
+      lines,
+      selections
+    }
+
+    const updated = [entry, ...history]
+    setHistory(updated)
+    localStorage.setItem('estimates', JSON.stringify(updated))
+
+    setSelections(initSelections())
+    setClientInfo({ name: '', address: '', notes: '' })
+    setView('estimator')
+
+    alert(T[lang].saved)
   }
-
-  const updated = [entry, ...history]
-  setHistory(updated)
-  localStorage.setItem('estimates', JSON.stringify(updated))
-
-  // Reset for next job
-  setSelections(initSelections())
-  setClientInfo({ name: '', address: '', notes: '' })
-  setView('estimator')
-
-  alert('Estimate saved!')
-}
 
   function handleReopen(entry) {
     setSelections(entry.selections)
@@ -88,9 +89,8 @@ function handleSave() {
 
   function handleExportPDF() {
     if (lines.length <= 1) return
-
     import('./utils/pdf.js').then(({ generatePDF }) => {
-      generatePDF(clientInfo, lines, totalLo, totalHi)
+      generatePDF(clientInfo, lines, totalLo, totalHi, lang)
     })
   }
 
@@ -140,7 +140,7 @@ function handleSave() {
     const permitHi = Math.round(totalHi * 0.04)
 
     lines.push({
-      name: 'Permits (est. ~4%)',
+      name: lang === 'en' ? 'Permits (est. ~4%)' : 'Permisos (est. ~4%)',
       lo: permitLo,
       hi: permitHi
     })
@@ -156,18 +156,37 @@ function handleSave() {
 
   return (
     <div style={{ maxWidth: 680, margin: '0 auto', padding: '1rem' }}>
-    <div style={{
-      borderLeft: '4px solid #2D5A27',
-      paddingLeft: 12,
-      marginBottom: 20
-    }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#2D5A27', marginBottom: 2 }}>
-        Dad's Construction
-      </h1>
-      <p style={{ fontSize: 13, color: '#888' }}>
-        Project Estimator · Greater Seattle Area
-      </p>
-    </div>
+
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20
+      }}>
+        <div style={{ borderLeft: '4px solid #2D5A27', paddingLeft: 12 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#2D5A27', marginBottom: 2 }}>
+            {T[lang].appTitle}
+          </h1>
+          <p style={{ fontSize: 13, color: '#888' }}>
+            {T[lang].appSubtitle}
+          </p>
+        </div>
+        <button
+          onClick={() => setLang(lang === 'en' ? 'es' : 'en')}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 8,
+            border: '2px solid #2D5A27',
+            background: '#fff',
+            color: '#2D5A27',
+            fontWeight: 700,
+            fontSize: 14
+          }}
+        >
+          {lang === 'en' ? 'ES' : 'EN'}
+        </button>
+      </div>
 
       {/* Nav */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
@@ -185,26 +204,25 @@ function handleSave() {
               fontSize: 14
             }}
           >
-            {v.charAt(0).toUpperCase() + v.slice(1)}
+            {T[lang][v]}
           </button>
         ))}
       </div>
 
-      {/* Views — we'll build these next */}
+      {/* Estimator view */}
       {view === 'estimator' && (
         <div>
-
-          {/* Section cards */}
           {SECTIONS.map(section => (
             <EstimatorSection
               key={section.id}
               section={section}
               selections={selections}
               onChange={handleChange}
+              lang={lang}
+              T={T}
             />
           ))}
 
-          {/* Total bar at the bottom */}
           {lines.length > 1 && (
             <div style={{
               background: '#2D5A27',
@@ -217,7 +235,7 @@ function handleSave() {
             }}>
               <div>
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-                  Estimated total
+                  {T[lang].estimatedTotal}
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: '#fff' }}>
                   ${totalLo.toLocaleString()} – ${totalHi.toLocaleString()}
@@ -235,14 +253,14 @@ function handleSave() {
                   fontSize: 14
                 }}
               >
-                Review →
+                {T[lang].review}
               </button>
             </div>
           )}
-
         </div>
       )}
 
+      {/* Summary view */}
       {view === 'summary' && (
         <SummaryView
           lines={lines}
@@ -252,16 +270,22 @@ function handleSave() {
           onClientChange={(val) => setClientInfo(prev => ({ ...prev, ...val }))}
           onSave={handleSave}
           onExportPDF={handleExportPDF}
+          lang={lang}
+          T={T}
         />
       )}
 
+      {/* History view */}
       {view === 'history' && (
         <HistoryView
           history={history}
           onReopen={handleReopen}
           onDelete={handleDelete}
+          lang={lang}
+          T={T}
         />
       )}
+
     </div>
   )
 }
