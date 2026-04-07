@@ -91,6 +91,8 @@ export const SECTIONS = [
           ['wood', 'Wood', [14, 22]]
         ],
         defaultSqft: 1500, unit: 'sq ft' },
+      { id: 'soffit-repair', label: 'Soffit repair / replacement',
+        type: 'sqft', rates: [8, 18], defaultSqft: 120, unit: 'linear ft' },
       { id: 'windows', label: 'Window replacement', type: 'qty',
         unit: 'windows', ratePerUnit: [700, 1400], defaultQty: 5 },
       { id: 'door-ext', label: 'Exterior door replacement', type: 'qty',
@@ -129,6 +131,8 @@ export const SECTIONS = [
         type: 'sqft', rates: [3, 7], defaultSqft: 2000, unit: 'sq ft' },
       { id: 'paint-trim', label: 'Trim and fascia painting',
         type: 'sqft', rates: [2, 5], defaultSqft: 300, unit: 'linear ft' },
+      { id: 'soffit-paint', label: 'Soffit painting',
+        type: 'sqft', rates: [1.5, 3.5], defaultSqft: 120, unit: 'linear ft' },
       { id: 'paint-deck', label: 'Deck stain / seal',
         type: 'sqft', rates: [2, 4], defaultSqft: 200, unit: 'sq ft' },
       { id: 'paint-fence', label: 'Fence stain / paint',
